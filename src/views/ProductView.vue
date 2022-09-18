@@ -45,7 +45,9 @@
                                     <h4>${{productDetails.price}}</h4>
                                 </div>
                                 <div class="quantity">
-                                    <router-link to="/cart"><a href="shopping-cart.html" class="primary-btn pd-cart">Add To Cart</a></router-link>
+                                    <router-link to="/cart">
+                                        <a @click="saveKeranjang(productDetails.id,productDetails.name,productDetails.price,productDetails.galleries[0].photo)" href="#" class="primary-btn pd-cart">Add To Cart</a>
+                                    </router-link>
                                 </div>
                             </div>
                         </div>
@@ -76,7 +78,8 @@ import axios from 'axios';
         data(){
             return {
                 gambar_default : '',
-                productDetails: []
+                productDetails: [],
+                keranjangUser : []
             }
             
         },
@@ -89,10 +92,30 @@ import axios from 'axios';
                 this.productDetails = data;
                 this.gambar_default = data.galleries[0].photo;
             },
+            saveKeranjang(idProduct , nameProduct,priceProduct,photoProduct){
+
+                var productStored = {
+                    "id" : idProduct,
+                    "name" : nameProduct,
+                    "price" : priceProduct,
+                    "photo" : photoProduct
+                }
+
+                this.keranjangUser.push(productStored);
+                const parsed = JSON.stringify(this.keranjangUser);
+                localStorage.setItem('keranjangUser',parsed);
+            }
         },
         mounted() {
+            if (localStorage.getItem('keranjangUser')){
+                try {
+                    this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser'));
+                } catch (e) {
+                    localStorage.removeItem('keranjangUser');
+                }
+            }
         axios
-        .get("http://shayna-backend.belajarkoding.com/api/products",{
+        .get("http://api-ujangstore.test/api/products",{
             params : {
                 id : this.$route.params.id
             }
